@@ -2,9 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "photolistmanager.h"
+#include "photomanager.h"
 #include "QListWidgetItem"
 #include "Qsize"
+#include "QTableWidgetItem"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,19 +21,31 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void AddPhoto(QString path,int index);
+    void ShowIcon();
     void resizeEvent(QResizeEvent * re);
 
 signals:
-
+    void SetRotationSignal(int angle,int index);
 private slots:
     void ClickOpenFileButtonSlot();
+
     void AddPhotoSlot(QString path,int index);
+
     void ClickDeleteButtonSlot();
-    void on_fileList_currentItemChanged(QListWidgetItem *current);
+
+    void ClickRightRotationButtonSlot();
+
+    void ClickLeftRotationButtonSlot();
+
+    void on_photoTable_currentItemChanged(QTableWidgetItem *current);
+
+    void ClickClearButtonSlot();
+
+    void on_comboBox_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
-    PhotoListManager* photoListManager;
+    PhotoManager* photoListManager;
     QSize iconLabelSize;
     bool iconLabelFlag = false;
 

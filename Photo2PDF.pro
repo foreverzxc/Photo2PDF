@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,11 +12,15 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    photolistmanager.cpp
+    photomanager.cpp \
+    tablewidgetupdown.cpp \
+    transformers.cpp
 
 HEADERS += \
     mainwindow.h \
-    photolistmanager.h
+    photomanager.h \
+    tablewidgetupdown.h \
+    transformers.h
 
 FORMS += \
     mainwindow.ui

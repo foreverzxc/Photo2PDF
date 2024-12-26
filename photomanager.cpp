@@ -1,11 +1,24 @@
-#include "photolistmanager.h"
+#include "photomanager.h"
 #include "QFileDialog.h"
+#include "transformers.h"
 
-PhotoListManager::PhotoListManager(QObject *parent): QObject(parent)
+PhotoManager::PhotoManager(QObject *parent): QObject(parent)
 {
 
 }
-void PhotoListManager::AddPhotos()
+
+void PhotoManager::SwapPhotosSlot(int a,int b)
+{
+    transformersList.swapItemsAt(a,b);
+}
+
+void PhotoManager::SetRotationSlot(int angle,int index)
+{
+    transformersList[index].rotation += angle;
+    transformersList[index].rotation %= 360;
+}
+
+void PhotoManager::AddPhotos()
 {
     QStringList fileNames;
     //定义文件对话框类
@@ -29,10 +42,9 @@ void PhotoListManager::AddPhotos()
     {
         for(auto item:fileNames)
         {
-            emit AddFileSignal(item,listLength);
-            listLength++;
+            emit AddFileSignal(item,photoLength);
+            photoLength++;
+            transformersList.append(Transformers());
         }
     }
-
-
 }
