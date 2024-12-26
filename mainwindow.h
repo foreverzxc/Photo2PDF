@@ -41,6 +41,8 @@ private slots:
 
     void ClickClearButtonSlot();
 
+    void ClickReverseButtonSlot();
+
     void on_comboBox_currentIndexChanged(int index);
 
 private:

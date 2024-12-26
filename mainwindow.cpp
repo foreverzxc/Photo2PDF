@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->photoTable,&TableWidgetUpDown::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
     connect(ui->rightRotationButton,&QPushButton::clicked,this,&MainWindow::ClickRightRotationButtonSlot);
     connect(ui->leftRotationButton,&QPushButton::clicked,this,&MainWindow::ClickLeftRotationButtonSlot);
+    connect(ui->reverseButton,&QPushButton::clicked,this,&MainWindow::ClickReverseButtonSlot); //反转photo tab
     connect(this,&MainWindow::SetRotationSignal,photoListManager,&PhotoManager::SetRotationSlot);
 }
 
@@ -103,6 +104,25 @@ void MainWindow::ClickClearButtonSlot()
     table->clearContents();
     table->setRowCount(0);
     photoListManager->photoLength = 0;
+}
+
+void MainWindow::ClickReverseButtonSlot()
+{
+    qDebug() << "into ClickReverseButtonSlot";
+
+    // 清空ab
+    auto table = ui->photoTable;
+    int rowCount = table->rowCount();
+    QList<QString> pathList;
+    for (int i = rowCount - 1; i >= 0; -- i){
+        pathList.push_back(table->item(i, 0)->text());
+        qDebug() << "current row is:" << i << "->>" << table->item(i, 0)->text();
+        table->removeRow(i);
+    }
+
+    // 重新添加
+    for (int i = 0; i < rowCount; ++ i)
+        this->AddPhotoSlot(pathList[i], i);
 }
 
 void MainWindow::ClickRightRotationButtonSlot()
