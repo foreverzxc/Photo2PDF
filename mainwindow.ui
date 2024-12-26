@@ -29,7 +29,33 @@
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="2">
+      <item row="0" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLineEdit" name="savePathEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="selectSavePathButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="2">
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
          <widget class="QGroupBox" name="groupBox">
@@ -69,6 +95,12 @@
                <property name="text">
                 <string>逆时针旋转</string>
                </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
               </widget>
              </item>
              <item>
@@ -80,10 +112,16 @@
                 </sizepolicy>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{qproperty-icon:url(E:\Qt\Project\Photo2PDF\resource\right_rotation_icon.png);qproperty-iconSize:20px;}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string>顺时针旋转</string>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -149,6 +187,42 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="3" column="0">
+       <widget class="TableWidgetUpDown" name="photoTable">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+        </property>
+        <property name="dragEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="dragDropOverwriteMode">
+         <bool>false</bool>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+        </property>
+        <property name="columnCount">
+         <number>1</number>
+        </property>
+        <column>
+         <property name="text">
+          <string>图片地址</string>
+         </property>
+        </column>
+       </widget>
       </item>
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,0">
@@ -220,7 +294,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="convertButton">
+         <widget class="QPushButton" name="exportPDFButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -239,42 +313,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item row="1" column="0">
-       <widget class="TableWidgetUpDown" name="photoTable">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-        </property>
-        <property name="dragEnabled">
-         <bool>false</bool>
-        </property>
-        <property name="dragDropOverwriteMode">
-         <bool>false</bool>
-        </property>
-        <property name="dragDropMode">
-         <enum>QAbstractItemView::DragDropMode::InternalMove</enum>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-        </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-        </property>
-        <property name="columnCount">
-         <number>1</number>
-        </property>
-        <column>
-         <property name="text">
-          <string>图片地址</string>
-         </property>
-        </column>
-       </widget>
       </item>
      </layout>
     </item>

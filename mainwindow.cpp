@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "QMessageBox"
-#include "QDropEvent"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,19 +8,54 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     photoListManager = new PhotoManager(this);
+
+    //click a button
     connect(ui->openFileButton,&QPushButton::clicked,this,&MainWindow::ClickOpenFileButtonSlot);
-    connect(photoListManager,&PhotoManager::AddFileSignal,this,&MainWindow::AddPhotoSlot);
     connect(ui->deleteButton,&QPushButton::clicked,this,&MainWindow::ClickDeleteButtonSlot);
     connect(ui->clearButton,&QPushButton::clicked,this,&MainWindow::ClickClearButtonSlot);
-    connect(this,&MainWindow::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
-    connect(ui->photoTable,&TableWidgetUpDown::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
     connect(ui->rightRotationButton,&QPushButton::clicked,this,&MainWindow::ClickRightRotationButtonSlot);
     connect(ui->leftRotationButton,&QPushButton::clicked,this,&MainWindow::ClickLeftRotationButtonSlot);
     connect(ui->reverseButton,&QPushButton::clicked,this,&MainWindow::ClickReverseButtonSlot); //反转photo tab
+    connect(ui->exportPDFButton,&QPushButton::clicked,this,&MainWindow::ClickedExportPDFButtonSlot);
+    connect(ui->selectSavePathButton,&QPushButton::clicked,this,&MainWindow::ClickedSelectSavePathButtonSlot);
+
+
+    /**************** Frontend -> Backend ****************/
+    //MainWindow -> photoListManager
     connect(this,&MainWindow::SetRotationSignal,photoListManager,&PhotoManager::SetRotationSlot);
+    connect(this,&MainWindow::SwapPhotosSignal,photoListManager,&PhotoManager::SwapPhotosSlot);
+    connect(this,&MainWindow::ExportPDFSignal,photoListManager,&PhotoManager::ExportPDFSlot);
+    connect(this,&MainWindow::SelectedSavePathSignal,photoListManager,&PhotoManager::SelectedSavePathSlot);
+    //photoTable -> PhotoManager
+    connect(ui->photoTable,&TableWidgetUpDown::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
+
+
+    /**************** Backend -> Frontend ****************/
+    //photoListManager -> MainWindow
+    connect(photoListManager,&PhotoManager::AddFileSignal,this,&MainWindow::AddPhotoSlot);
+
+
+    /**************** Frontend -> Frontend ****************/
+    //photoTable -> MainWindow
     connect(ui->photoTable,&TableWidgetUpDown::ShowIconSignal,this,&MainWindow::ShowIcon);
+
+
+    /**************** Backend -> Backend ****************/
+
+
+
+    InitIcon();
+
 }
 
+void MainWindow::InitIcon()
+{
+    QIcon right_rotation_icon,left_rotation_icon;
+    right_rotation_icon.addPixmap(QPixmap(":/resource/right_rotation_icon.png"), QIcon::Normal, QIcon::On);
+    left_rotation_icon.addPixmap(QPixmap(":/resource/left_rotation_icon.png"), QIcon::Normal, QIcon::On);
+    ui->rightRotationButton->setIcon(right_rotation_icon);
+    ui->leftRotationButton->setIcon(left_rotation_icon);
+}
 
 void MainWindow::resizeEvent(QResizeEvent * re)
 {
@@ -130,20 +164,26 @@ void MainWindow::ClickReverseButtonSlot()
 
     for(int i=0;i<rowCount/2;++i)
     {
-        emit SwapPhotosSingal(i,rowCount-i-1);
+        emit SwapPhotosSignal(i,rowCount-i-1);
     }
 }
 
 void MainWindow::ClickRightRotationButtonSlot()
 {
-    emit SetRotationSignal(90,ui->photoTable->currentRow());
-    ShowIcon();
+    if(ui->photoTable->currentItem()!=nullptr)
+    {
+        emit SetRotationSignal(90,ui->photoTable->currentRow());
+        ShowIcon();
+    }
 }
 
 void MainWindow::ClickLeftRotationButtonSlot()
 {
-    emit SetRotationSignal(-90,ui->photoTable->currentRow());
-    ShowIcon();
+    if(ui->photoTable->currentItem()!=nullptr)
+    {
+        emit SetRotationSignal(-90,ui->photoTable->currentRow());
+        ShowIcon();
+    }
 }
 
 void MainWindow::on_comboBox_currentIndexChanged(int index)
@@ -165,5 +205,59 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
         noExpandCheckBox->setEnabled(true);
         break;
     }
+}
+
+
+void MainWindow::ClickedExportPDFButtonSlot()
+{
+    QDir dir(ui->savePathEdit->text());
+    if(ui->savePathEdit->text().isEmpty())
+    {
+        QMessageBox::information(this, "Error", "请输入保存地址");
+        return;
+    }
+    if(ui->photoTable->rowCount()==0)
+    {
+        QMessageBox::information(this, "Error", "请打开至少一个文件");
+        return;
+    }
+    if(!dir.Writable)
+    {
+        QMessageBox::information(this, "Error", "该路径不正确或没有写入权限");
+        return;
+    }
+    QStringList fileNames;
+    auto table = ui->photoTable;
+    for (int row = 0; row < table->rowCount(); ++row)
+    {
+        QTableWidgetItem *item = table->item(row, 0);
+        if (item)
+        {
+            QString cellText = item->text();
+            fileNames.append(cellText);
+        }
+    }
+    emit ExportPDFSignal(fileNames);
+
+}
+
+
+void MainWindow::ClickedSelectSavePathButtonSlot()
+{
+    QString path = QFileDialog::getSaveFileName(nullptr, tr("选择保存路径"), QDir::homePath(), tr("All Files (*)"));
+    if(path.right(4)!=".pdf")
+    {
+        path += ".pdf";
+    }
+    // 如果用户选择了路径，则显示在lineEdit中
+    if (!path.isEmpty()) {
+        ui->savePathEdit->setText(path);
+    }
+}
+
+
+void MainWindow::on_savePathEdit_textChanged()
+{
+    emit SelectedSavePathSignal(ui->savePathEdit->text());
 }
 

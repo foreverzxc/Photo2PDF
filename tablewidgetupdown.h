@@ -12,8 +12,10 @@ class TableWidgetUpDown : public QTableWidget
 signals:
     void ShowIconSignal();
     void SwapPhotosSingal(int a,int b);
+
 public:
     explicit TableWidgetUpDown(QWidget *parent = nullptr);
+
 protected:
     void dropEvent(QDropEvent *event);
 };

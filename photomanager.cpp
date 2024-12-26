@@ -1,6 +1,5 @@
 #include "photomanager.h"
-#include "QFileDialog.h"
-#include "transformers.h"
+
 
 PhotoManager::PhotoManager(QObject *parent): QObject(parent)
 {
@@ -16,6 +15,11 @@ void PhotoManager::SetRotationSlot(int angle,int index)
 {
     transformersList[index].rotation += angle;
     transformersList[index].rotation %= 360;
+}
+
+void PhotoManager::SelectedSavePathSlot(QString path)
+{
+    outputPdfPath = path;
 }
 
 void PhotoManager::AddPhotos()
@@ -47,4 +51,53 @@ void PhotoManager::AddPhotos()
             transformersList.append(Transformers());
         }
     }
+}
+
+void PhotoManager::ExportPDFSlot(QStringList fileNames)
+{
+    QPdfWriter pdfWriter(outputPdfPath);
+    pdfWriter.setResolution(300);  // 设置 DPI 为 300
+    pdfWriter.setPageMargins(QMarginsF(0, 0, 0, 0));
+
+    QPainter painter;
+
+    // 遍历每张图片
+    for (int i = 0; i < fileNames.size(); ++i) {
+        QString imagePath = fileNames[i];
+        QImage image(imagePath);
+        if (image.isNull()) {
+            qWarning() << "Failed to load image:" << imagePath;
+            continue;
+        }
+        QTransform transform;
+        transform.rotate(transformersList[i].rotation);
+        QImage transformedImage = image.transformed(transform);
+
+        // 将图片的尺寸转化为毫米 (1 inch == 25.4 mm)
+        qreal dpi = 300.0;
+        qreal widthInMm = transformedImage.width() * 25.4 / dpi;  // 转换为毫米
+        qreal heightInMm = transformedImage.height() * 25.4 / dpi;  // 转换为毫米
+
+        // 设置当前页面大小为图片尺寸，单位为毫米
+        pdfWriter.setPageSize(QPageSize(QSizeF(widthInMm, heightInMm), QPageSize::Millimeter));
+
+        // 对于第一张图片，初始化 QPainter
+        if (i == 0) {
+            if (!painter.begin(&pdfWriter)) {
+                qWarning() << "Failed to begin painting PDF.";
+                return;
+            }
+            // 设置渲染提示，提升画图效果
+            painter.setRenderHint(QPainter::Antialiasing);
+        } else {
+            // 后续图片需要新建页面
+            pdfWriter.newPage();
+        }
+        painter.drawImage(0, 0, transformedImage);
+    }
+
+    painter.end();
+
+    qDebug() << "PDF created successfully at:" << outputPdfPath;
+
 }

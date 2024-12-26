@@ -1,4 +1,4 @@
-QT       += core gui widgets
+QT       += core gui widgets printsupport pdf
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -21,6 +21,9 @@ HEADERS += \
     photomanager.h \
     tablewidgetupdown.h \
     transformers.h
+
+RESOURCES += \
+    icon.qrc
 
 FORMS += \
     mainwindow.ui

@@ -2,10 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QDropEvent>
+#include <QListWidgetItem>
+#include <QSize>
+#include <QTableWidgetItem>
+//user
 #include "photomanager.h"
-#include "QListWidgetItem"
-#include "Qsize"
-#include "QTableWidgetItem"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,17 +19,20 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void AddPhoto(QString path,int index);
+    void InitIcon();
     void ShowIcon();
     void resizeEvent(QResizeEvent * re);
 
 signals:
     void SetRotationSignal(int angle,int index);
-    void SwapPhotosSingal(int a,int b);
+    void SwapPhotosSignal(int a,int b);
+    void ExportPDFSignal(QStringList fileNames);
+    void SelectedSavePathSignal(QString path);
+
 private slots:
     void ClickOpenFileButtonSlot();
 
@@ -45,6 +51,12 @@ private slots:
     void ClickReverseButtonSlot();
 
     void on_comboBox_currentIndexChanged(int index);
+
+    void ClickedExportPDFButtonSlot();
+
+    void ClickedSelectSavePathButtonSlot();
+
+    void on_savePathEdit_textChanged();
 
 private:
     Ui::MainWindow *ui;
