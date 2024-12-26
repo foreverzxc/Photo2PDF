@@ -29,6 +29,8 @@ void TableWidgetUpDown::dropEvent(QDropEvent *event)
     QTableWidgetItem *item = this->itemAt(event->position().toPoint()); // 获取落点的item
     if(item !=nullptr){                                        // 判断是否为空
         row_dst = item->row();                                 // 不为空 获取其行号
+        qDebug() << row_src << " "<< row_dst;
+        emit SwapPhotosSingal(row_src,row_dst);
         // 保证鼠标落下的位置 就是拖拽的一行最后所移动到的位置(考虑插入新行 移除原行的上下变化)
         row_src = (row_src > row_dst?    row_src + 1:row_src); // 如果src在dst的下方(行号大)，后续插入dst会影响src的行号
         row_dst = (row_src < row_dst?    row_dst + 1:row_dst); // 如果src在dst的上方(行号小)，后续移除src会影响dst的行号
@@ -38,12 +40,14 @@ void TableWidgetUpDown::dropEvent(QDropEvent *event)
         row_dst = this->rowCount();// 获取行总数
         this->insertRow(row_dst);  // 在最后新增一行
     }
+
     // 执行移动 并移除原行
     for(int i = 0;i < this->columnCount();i++){            // 遍历列
         this->setItem(row_dst,i,this->takeItem(row_src,i));// 每一列item的移动
     }
     this->setRowHeight(row_dst,40);
     this->removeRow(row_src);                              // 删除原行
+    emit ShowIconSignal();
 }
 
 

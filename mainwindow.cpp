@@ -13,11 +13,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(photoListManager,&PhotoManager::AddFileSignal,this,&MainWindow::AddPhotoSlot);
     connect(ui->deleteButton,&QPushButton::clicked,this,&MainWindow::ClickDeleteButtonSlot);
     connect(ui->clearButton,&QPushButton::clicked,this,&MainWindow::ClickClearButtonSlot);
+    connect(this,&MainWindow::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
     connect(ui->photoTable,&TableWidgetUpDown::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
     connect(ui->rightRotationButton,&QPushButton::clicked,this,&MainWindow::ClickRightRotationButtonSlot);
     connect(ui->leftRotationButton,&QPushButton::clicked,this,&MainWindow::ClickLeftRotationButtonSlot);
     connect(ui->reverseButton,&QPushButton::clicked,this,&MainWindow::ClickReverseButtonSlot); //反转photo tab
     connect(this,&MainWindow::SetRotationSignal,photoListManager,&PhotoManager::SetRotationSlot);
+    connect(ui->photoTable,&TableWidgetUpDown::ShowIconSignal,this,&MainWindow::ShowIcon);
 }
 
 
@@ -56,6 +58,7 @@ void MainWindow::ClickDeleteButtonSlot()
     {
         ui->photoTable->removeRow(currentRow);
         photoListManager->photoLength--;
+        photoListManager->transformersList.removeAt(currentRow);
     }
 }
 
@@ -104,6 +107,7 @@ void MainWindow::ClickClearButtonSlot()
     table->clearContents();
     table->setRowCount(0);
     photoListManager->photoLength = 0;
+    photoListManager->transformersList.clear();
 }
 
 void MainWindow::ClickReverseButtonSlot()
@@ -116,13 +120,18 @@ void MainWindow::ClickReverseButtonSlot()
     QList<QString> pathList;
     for (int i = rowCount - 1; i >= 0; -- i){
         pathList.push_back(table->item(i, 0)->text());
-        qDebug() << "current row is:" << i << "->>" << table->item(i, 0)->text();
+        // qDebug() << "current row is:" << i << "->>" << table->item(i, 0)->text();
         table->removeRow(i);
     }
 
     // 重新添加
     for (int i = 0; i < rowCount; ++ i)
         this->AddPhotoSlot(pathList[i], i);
+
+    for(int i=0;i<rowCount/2;++i)
+    {
+        emit SwapPhotosSingal(i,rowCount-i-1);
+    }
 }
 
 void MainWindow::ClickRightRotationButtonSlot()

@@ -10,6 +10,7 @@ class TableWidgetUpDown : public QTableWidget
 {
     Q_OBJECT
 signals:
+    void ShowIconSignal();
     void SwapPhotosSingal(int a,int b);
 public:
     explicit TableWidgetUpDown(QWidget *parent = nullptr);

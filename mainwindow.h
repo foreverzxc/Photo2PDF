@@ -26,6 +26,7 @@ public:
 
 signals:
     void SetRotationSignal(int angle,int index);
+    void SwapPhotosSingal(int a,int b);
 private slots:
     void ClickOpenFileButtonSlot();
 
