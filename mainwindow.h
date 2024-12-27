@@ -34,6 +34,11 @@ signals:
     void SwapPhotosSignal(int a,int b);
     void ExportPDFSignal(QStringList fileNames);
     void SelectedSavePathSignal(QString path);
+    void SetConfigDpiSignal(int dpi);
+    void SetConfigOutputPathSignal(QString path);
+    void SetConfigResizeOptionSignal(ResizeOption resizeOption);
+    void SetConfigPixelSignal(int value);
+    void SetConfigNoExpandSignal(bool value);
 
 private slots:
     void ClickOpenFileButtonSlot();
@@ -65,6 +70,10 @@ private slots:
     void CloseProgressDialogSlot();
 
     void on_savePathEdit_textChanged();
+
+    void on_pixelLineEdit_textChanged(const QString &arg1);
+
+    void on_noExpandCheckBox_checkStateChanged(const Qt::CheckState &arg1);
 
 private:
     Ui::MainWindow *ui;

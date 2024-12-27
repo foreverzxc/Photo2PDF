@@ -15,14 +15,15 @@
 //user
 #include "transformers.h"
 #include "exportpdfworker.h"
+#include "config.h"
 
 class PhotoManager : public QObject
 {
     Q_OBJECT
 public:
     long long photoLength=0;
-    QString outputPdfPath;
     QList<Transformers> transformersList;
+    ExportPDFConfig config;
 
     PhotoManager(QObject *parent);
     void AddPhotos();
@@ -43,7 +44,11 @@ public slots:
     void SwapPhotosSlot(int a,int b);
     void SetRotationSlot(int angle,int index);
     void ExportPDFSlot(QStringList fileNames);
-    void SelectedSavePathSlot(QString path);
+    void SetConfigDpiSlot(int dpi);
+    void SetConfigOutputPathSlot(QString path);
+    void SetConfigResizeOptionSlot(ResizeOption resizeOption);
+    void SetConfigPixelSlot(int value);
+    void SetConfigNoExpandSlot(bool value);
 };
 
 #endif // PHOTOMANAGER_H

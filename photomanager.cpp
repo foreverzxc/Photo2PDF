@@ -17,11 +17,6 @@ void PhotoManager::SetRotationSlot(int angle,int index)
     transformersList[index].rotation %= 360;
 }
 
-void PhotoManager::SelectedSavePathSlot(QString path)
-{
-    outputPdfPath = path;
-}
-
 void PhotoManager::AddPhotos()
 {
     QStringList fileNames;
@@ -61,7 +56,7 @@ void PhotoManager::ExportPDFSlot(QStringList fileNames)
     emit SetProgressValueSignal(0);  // 可以初始化进度为0
 
     // 创建新的线程来执行导出PDF
-    ExportPDFWorker *worker = new ExportPDFWorker(fileNames, outputPdfPath,transformersList);
+    ExportPDFWorker *worker = new ExportPDFWorker(fileNames, transformersList, config);
     connect(worker, &ExportPDFWorker::ProgressUpdatedSignal, this, &PhotoManager::UpdateProgress);
     connect(worker, &ExportPDFWorker::FinishedSignal, this, &PhotoManager::OnExportFinished);
     connect(worker, &ExportPDFWorker::ErrorOccurredSignal, this, &PhotoManager::OnErrorOccurred);
@@ -89,4 +84,25 @@ void PhotoManager::OnErrorOccurred(const QString &message)
 {
     emit CloseProgressDialogSignal();
     qWarning() << "Error during PDF export: " << message;
+}
+
+void PhotoManager::SetConfigDpiSlot(int dpi)
+{
+    config.dpi = dpi;
+}
+void PhotoManager::SetConfigOutputPathSlot(QString path)
+{
+    config.outputPath = path;
+}
+void PhotoManager::SetConfigResizeOptionSlot(ResizeOption resizeOption)
+{
+    config.resizeOption = resizeOption;
+}
+void PhotoManager::SetConfigPixelSlot(int value)
+{
+    config.configPixel = value;
+}
+void PhotoManager::SetConfigNoExpandSlot(bool value)
+{
+    config.noExpand = value;
 }

@@ -24,7 +24,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this,&MainWindow::SetRotationSignal,photoListManager,&PhotoManager::SetRotationSlot);
     connect(this,&MainWindow::SwapPhotosSignal,photoListManager,&PhotoManager::SwapPhotosSlot);
     connect(this,&MainWindow::ExportPDFSignal,photoListManager,&PhotoManager::ExportPDFSlot);
-    connect(this,&MainWindow::SelectedSavePathSignal,photoListManager,&PhotoManager::SelectedSavePathSlot);
+    connect(this,&MainWindow::SetConfigDpiSignal,photoListManager,&PhotoManager::SetConfigDpiSlot);
+    connect(this,&MainWindow::SetConfigOutputPathSignal,photoListManager,&PhotoManager::SetConfigOutputPathSlot);
+    connect(this,&MainWindow::SetConfigResizeOptionSignal,photoListManager,&PhotoManager::SetConfigResizeOptionSlot);
+    connect(this,&MainWindow::SetConfigPixelSignal,photoListManager,&PhotoManager::SetConfigPixelSlot);
+    connect(this,&MainWindow::SetConfigNoExpandSignal,photoListManager,&PhotoManager::SetConfigNoExpandSlot);
     //photoTable -> PhotoManager
     connect(ui->photoTable,&TableWidgetUpDown::SwapPhotosSingal,photoListManager,&PhotoManager::SwapPhotosSlot);
 
@@ -54,11 +58,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::InitUI()
 {
+    setWindowTitle("Photo2PDF ---- by zxc Email:forever__zxc@163.com");
     QIcon right_rotation_icon,left_rotation_icon;
     right_rotation_icon.addPixmap(QPixmap(":/resource/right_rotation_icon.png"), QIcon::Normal, QIcon::On);
     left_rotation_icon.addPixmap(QPixmap(":/resource/left_rotation_icon.png"), QIcon::Normal, QIcon::On);
     ui->rightRotationButton->setIcon(right_rotation_icon);
     ui->leftRotationButton->setIcon(left_rotation_icon);
+
+    ui->pixelLineEdit->setValidator(new QIntValidator(ui->pixelLineEdit));
 }
 
 void MainWindow::ShowProgressDialog(int maxValue)
@@ -118,6 +125,7 @@ void MainWindow::ShowIcon()
     if (!image.isNull())
     {
         QPixmap pixmap = QPixmap::fromImage(image);
+        ui->photoPixelInfoLabel->setText("当前图片大小为：" + QString::number(pixmap.width()) + "×" + QString::number(pixmap.height()));
         QTransform transform;
         transform.rotate(photoListManager->transformersList[index].rotation);
         QPixmap transformedPixmap = pixmap.transformed(transform);
@@ -145,6 +153,7 @@ void MainWindow::on_photoTable_currentItemChanged(QTableWidgetItem *current)
     else
     {
         ui->iconLabel->clear();
+        ui->photoPixelInfoLabel->setText("当前图片大小为：");
     }
 }
 
@@ -209,14 +218,17 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
     case 0://不改变分辨率
         pixelLineEdit->setEnabled(false);
         noExpandCheckBox->setEnabled(false);
+        emit SetConfigResizeOptionSignal(ResizeOption::NoResize);
         break;
     case 1://设置短边
         pixelLineEdit->setEnabled(true);
         noExpandCheckBox->setEnabled(true);
+        emit SetConfigResizeOptionSignal(ResizeOption::ResizeShortSide);
         break;
     case 2://设置长边
         pixelLineEdit->setEnabled(true);
         noExpandCheckBox->setEnabled(true);
+        emit SetConfigResizeOptionSignal(ResizeOption::ResizeLongSide);
         break;
     }
 }
@@ -286,5 +298,23 @@ void MainWindow::ClickedSelectSavePathButtonSlot()
 void MainWindow::on_savePathEdit_textChanged()
 {
     emit SelectedSavePathSignal(ui->savePathEdit->text());
+    emit SetConfigOutputPathSignal(ui->savePathEdit->text());
+}
+
+
+void MainWindow::on_pixelLineEdit_textChanged(const QString &arg1)
+{
+    emit SetConfigPixelSignal(arg1.toInt());
+}
+
+
+void MainWindow::on_noExpandCheckBox_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if(arg1 == Qt::Checked)
+        emit SetConfigNoExpandSignal(true);
+    else if(arg1 == Qt::Unchecked)
+    {
+        emit SetConfigNoExpandSignal(false);
+    }
 }
 

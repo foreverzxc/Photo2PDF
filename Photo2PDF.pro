@@ -17,6 +17,7 @@ SOURCES += \
     transformers.cpp
 
 HEADERS += \
+    config.h \
     exportpdfworker.h \
     mainwindow.h \
     photomanager.h \
