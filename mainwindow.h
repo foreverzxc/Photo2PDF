@@ -7,6 +7,7 @@
 #include <QListWidgetItem>
 #include <QSize>
 #include <QTableWidgetItem>
+#include <QProgressDialog>
 //user
 #include "photomanager.h"
 
@@ -23,8 +24,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void AddPhoto(QString path,int index);
-    void InitIcon();
+    void InitUI();
     void ShowIcon();
+    void ShowProgressDialog(int maxValue);
     void resizeEvent(QResizeEvent * re);
 
 signals:
@@ -56,6 +58,12 @@ private slots:
 
     void ClickedSelectSavePathButtonSlot();
 
+    void SetProgressValueSlot(int value);
+
+    void SetProgressMaxValueSlot(int maxValue);
+
+    void CloseProgressDialogSlot();
+
     void on_savePathEdit_textChanged();
 
 private:
@@ -63,6 +71,8 @@ private:
     PhotoManager* photoListManager;
     QSize iconLabelSize;
     bool iconLabelFlag = false;
+
+    QProgressDialog *progressDialog;
 
 };
 #endif // MAINWINDOW_H

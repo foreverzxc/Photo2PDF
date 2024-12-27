@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     photoListManager = new PhotoManager(this);
-
     //click a button
     connect(ui->openFileButton,&QPushButton::clicked,this,&MainWindow::ClickOpenFileButtonSlot);
     connect(ui->deleteButton,&QPushButton::clicked,this,&MainWindow::ClickDeleteButtonSlot);
@@ -33,6 +32,11 @@ MainWindow::MainWindow(QWidget *parent)
     /**************** Backend -> Frontend ****************/
     //photoListManager -> MainWindow
     connect(photoListManager,&PhotoManager::AddFileSignal,this,&MainWindow::AddPhotoSlot);
+    connect(photoListManager,&PhotoManager::SetProgressValueSignal,this,&MainWindow::SetProgressValueSlot);
+    connect(photoListManager,&PhotoManager::SetProgressMaxValueSignal,this,&MainWindow::SetProgressMaxValueSlot);
+    connect(photoListManager,&PhotoManager::CloseProgressDialogSignal,this,&MainWindow::CloseProgressDialogSlot);
+
+
 
 
     /**************** Frontend -> Frontend ****************/
@@ -44,17 +48,27 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    InitIcon();
+    InitUI();
 
 }
 
-void MainWindow::InitIcon()
+void MainWindow::InitUI()
 {
     QIcon right_rotation_icon,left_rotation_icon;
     right_rotation_icon.addPixmap(QPixmap(":/resource/right_rotation_icon.png"), QIcon::Normal, QIcon::On);
     left_rotation_icon.addPixmap(QPixmap(":/resource/left_rotation_icon.png"), QIcon::Normal, QIcon::On);
     ui->rightRotationButton->setIcon(right_rotation_icon);
     ui->leftRotationButton->setIcon(left_rotation_icon);
+}
+
+void MainWindow::ShowProgressDialog(int maxValue)
+{
+    progressDialog = new QProgressDialog("任务进行中...", "取消", 0, maxValue, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->setAutoClose(true);
+    progressDialog->setCancelButton(nullptr);
+    // progressDialog->setRange(0,maxValue);//设置进度条范围
+    progressDialog->show();
 }
 
 void MainWindow::resizeEvent(QResizeEvent * re)
@@ -207,7 +221,6 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
     }
 }
 
-
 void MainWindow::ClickedExportPDFButtonSlot()
 {
     QDir dir(ui->savePathEdit->text());
@@ -237,24 +250,38 @@ void MainWindow::ClickedExportPDFButtonSlot()
             fileNames.append(cellText);
         }
     }
+    ShowProgressDialog(photoListManager->photoLength);
     emit ExportPDFSignal(fileNames);
-
 }
 
+void MainWindow::SetProgressValueSlot(int value)
+{
+    progressDialog->setValue(value);
+}
+
+void MainWindow::SetProgressMaxValueSlot(int maxValue)
+{
+    progressDialog->setMaximum(maxValue);
+}
+
+void MainWindow::CloseProgressDialogSlot()
+{
+    progressDialog->close();
+}
 
 void MainWindow::ClickedSelectSavePathButtonSlot()
 {
-    QString path = QFileDialog::getSaveFileName(nullptr, tr("选择保存路径"), QDir::homePath(), tr("All Files (*)"));
+    QString path = QFileDialog::getSaveFileName(this, tr("选择保存路径"), ".", tr("*.pdf"));
+    if (path.isEmpty())
+    {
+        return;
+    }
     if(path.right(4)!=".pdf")
     {
         path += ".pdf";
     }
-    // 如果用户选择了路径，则显示在lineEdit中
-    if (!path.isEmpty()) {
-        ui->savePathEdit->setText(path);
-    }
+    ui->savePathEdit->setText(path);
 }
-
 
 void MainWindow::on_savePathEdit_textChanged()
 {

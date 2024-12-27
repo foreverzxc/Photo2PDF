@@ -53,51 +53,40 @@ void PhotoManager::AddPhotos()
     }
 }
 
+
+
 void PhotoManager::ExportPDFSlot(QStringList fileNames)
 {
-    QPdfWriter pdfWriter(outputPdfPath);
-    pdfWriter.setResolution(300);  // 设置 DPI 为 300
-    pdfWriter.setPageMargins(QMarginsF(0, 0, 0, 0));
+    // 发送信号告知主线程操作开始
+    emit SetProgressValueSignal(0);  // 可以初始化进度为0
 
-    QPainter painter;
+    // 创建新的线程来执行导出PDF
+    ExportPDFWorker *worker = new ExportPDFWorker(fileNames, outputPdfPath,transformersList);
+    connect(worker, &ExportPDFWorker::ProgressUpdatedSignal, this, &PhotoManager::UpdateProgress);
+    connect(worker, &ExportPDFWorker::FinishedSignal, this, &PhotoManager::OnExportFinished);
+    connect(worker, &ExportPDFWorker::ErrorOccurredSignal, this, &PhotoManager::OnErrorOccurred);
 
-    // 遍历每张图片
-    for (int i = 0; i < fileNames.size(); ++i) {
-        QString imagePath = fileNames[i];
-        QImage image(imagePath);
-        if (image.isNull()) {
-            qWarning() << "Failed to load image:" << imagePath;
-            continue;
-        }
-        QTransform transform;
-        transform.rotate(transformersList[i].rotation);
-        QImage transformedImage = image.transformed(transform);
+    // 启动线程
+    worker->start();
+}
 
-        // 将图片的尺寸转化为毫米 (1 inch == 25.4 mm)
-        qreal dpi = 300.0;
-        qreal widthInMm = transformedImage.width() * 25.4 / dpi;  // 转换为毫米
-        qreal heightInMm = transformedImage.height() * 25.4 / dpi;  // 转换为毫米
+// 更新进度条
+void PhotoManager::UpdateProgress(int current, int total)
+{
+    emit SetProgressValueSignal(current);
+    emit SetProgressMaxValueSignal(total);
+}
 
-        // 设置当前页面大小为图片尺寸，单位为毫米
-        pdfWriter.setPageSize(QPageSize(QSizeF(widthInMm, heightInMm), QPageSize::Millimeter));
+// 导出完成
+void PhotoManager::OnExportFinished()
+{
+    emit CloseProgressDialogSignal();
+    qDebug() << "PDF export completed successfully.";
+}
 
-        // 对于第一张图片，初始化 QPainter
-        if (i == 0) {
-            if (!painter.begin(&pdfWriter)) {
-                qWarning() << "Failed to begin painting PDF.";
-                return;
-            }
-            // 设置渲染提示，提升画图效果
-            painter.setRenderHint(QPainter::Antialiasing);
-        } else {
-            // 后续图片需要新建页面
-            pdfWriter.newPage();
-        }
-        painter.drawImage(0, 0, transformedImage);
-    }
-
-    painter.end();
-
-    qDebug() << "PDF created successfully at:" << outputPdfPath;
-
+// 处理错误
+void PhotoManager::OnErrorOccurred(const QString &message)
+{
+    emit CloseProgressDialogSignal();
+    qWarning() << "Error during PDF export: " << message;
 }

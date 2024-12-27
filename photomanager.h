@@ -11,8 +11,10 @@
 #include <QPrinter>
 #include <QPdfDocument>
 #include <QMarginsF>
-
+#include <QThread>
+//user
 #include "transformers.h"
+#include "exportpdfworker.h"
 
 class PhotoManager : public QObject
 {
@@ -25,9 +27,17 @@ public:
     PhotoManager(QObject *parent);
     void AddPhotos();
     void ExportPDF();
+    void UpdateProgress(int current, int total);
+    void OnErrorOccurred(const QString &message);
+    void OnExportFinished();
 
 signals:
     void AddFileSignal(QString path,int index);
+    void SetProgressValueSignal(int value);
+    void CloseProgressDialogSignal();
+    void SetProgressMaxValueSignal(int maxValue);
+
+
 
 public slots:
     void SwapPhotosSlot(int a,int b);
