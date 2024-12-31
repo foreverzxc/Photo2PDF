@@ -32,7 +32,7 @@ public:
 signals:
     void SetRotationSignal(int angle,int index);
     void SwapPhotosSignal(int a,int b);
-    void ExportPDFSignal(QStringList fileNames);
+    void ExportPDFSignal(QStringList fileNames,QStringList pages);
     void SelectedSavePathSignal(QString path);
     void SetConfigDpiSignal(int dpi);
     void SetConfigOutputPathSignal(QString path);
@@ -41,39 +41,30 @@ signals:
     void SetConfigNoExpandSignal(bool value);
 
 private slots:
+    //click a button
     void ClickOpenFileButtonSlot();
-
-    void AddPhotoSlot(QString path,int index);
-
+    void ClickedOpenPDFButtonSlot();
     void ClickDeleteButtonSlot();
-
     void ClickRightRotationButtonSlot();
-
     void ClickLeftRotationButtonSlot();
-
-    void on_photoTable_currentItemChanged(QTableWidgetItem *current);
-
     void ClickClearButtonSlot();
-
     void ClickReverseButtonSlot();
-
-    void on_comboBox_currentIndexChanged(int index);
-
     void ClickedExportPDFButtonSlot();
-
     void ClickedSelectSavePathButtonSlot();
-
+    //Qt default
+    void on_photoTable_currentItemChanged(QTableWidgetItem *current);
+    void on_comboBox_currentIndexChanged(int index);
+    void on_savePathEdit_textChanged();
+    void on_pixelLineEdit_textChanged(const QString &arg1);
+    void on_noExpandCheckBox_checkStateChanged(const Qt::CheckState &arg1);
+    //user
+    void AddPhotoSlot(QString path,int index);
+    void AddPDFSlot(QString path,int page,int index);
     void SetProgressValueSlot(int value);
-
     void SetProgressMaxValueSlot(int maxValue);
-
     void CloseProgressDialogSlot();
 
-    void on_savePathEdit_textChanged();
 
-    void on_pixelLineEdit_textChanged(const QString &arg1);
-
-    void on_noExpandCheckBox_checkStateChanged(const Qt::CheckState &arg1);
 
 private:
     Ui::MainWindow *ui;

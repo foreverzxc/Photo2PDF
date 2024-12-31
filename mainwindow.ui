@@ -248,7 +248,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,0">
+       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,0,0">
         <property name="spacing">
          <number>60</number>
         </property>
@@ -267,7 +267,20 @@
            </size>
           </property>
           <property name="text">
-           <string>打开文件</string>
+           <string>打开文件图片</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="openPDFButton">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>50</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>打开PDF</string>
           </property>
          </widget>
         </item>

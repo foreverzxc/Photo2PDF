@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     photoListManager = new PhotoManager(this);
     //click a button
     connect(ui->openFileButton,&QPushButton::clicked,this,&MainWindow::ClickOpenFileButtonSlot);
+    connect(ui->openPDFButton,&QPushButton::clicked,this,&MainWindow::ClickedOpenPDFButtonSlot);
     connect(ui->deleteButton,&QPushButton::clicked,this,&MainWindow::ClickDeleteButtonSlot);
     connect(ui->clearButton,&QPushButton::clicked,this,&MainWindow::ClickClearButtonSlot);
     connect(ui->rightRotationButton,&QPushButton::clicked,this,&MainWindow::ClickRightRotationButtonSlot);
@@ -36,11 +37,10 @@ MainWindow::MainWindow(QWidget *parent)
     /**************** Backend -> Frontend ****************/
     //photoListManager -> MainWindow
     connect(photoListManager,&PhotoManager::AddFileSignal,this,&MainWindow::AddPhotoSlot);
+    connect(photoListManager,&PhotoManager::AddPDFSignal,this,&MainWindow::AddPDFSlot);
     connect(photoListManager,&PhotoManager::SetProgressValueSignal,this,&MainWindow::SetProgressValueSlot);
     connect(photoListManager,&PhotoManager::SetProgressMaxValueSignal,this,&MainWindow::SetProgressMaxValueSlot);
     connect(photoListManager,&PhotoManager::CloseProgressDialogSignal,this,&MainWindow::CloseProgressDialogSlot);
-
-
 
 
     /**************** Frontend -> Frontend ****************/
@@ -80,9 +80,19 @@ void MainWindow::ShowProgressDialog(int maxValue)
 
 void MainWindow::resizeEvent(QResizeEvent * re)
 {
-    iconLabelSize = ui->iconLabel->size();
+    // iconLabelFlag = false;
+    // iconLabelSize = ui->iconLabel->size();
     // qDebug()<<ui->photoTable->width()<<" "<<ui->photoTable->columnWidth(0)<< " "<< ui->photoTable->columnWidth(1);
-    ui->photoTable->setColumnWidth(0,ui->photoTable->width()-5);
+    auto table = ui->photoTable;
+    if(table->columnCount()==1)
+    {
+        table->setColumnWidth(0,table->width());
+    }
+    else
+    {
+        table->setColumnWidth(0,table->width()*0.9);
+        table->setColumnWidth(1,table->width()*0.1);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -96,6 +106,11 @@ void MainWindow::ClickOpenFileButtonSlot()
     photoListManager->AddPhotos();
 }
 
+void MainWindow::ClickedOpenPDFButtonSlot()
+{
+    photoListManager->AddPDF();
+}
+
 void MainWindow::AddPhotoSlot(QString path,int index)
 {
     auto table = ui->photoTable;
@@ -104,6 +119,19 @@ void MainWindow::AddPhotoSlot(QString path,int index)
     table->setColumnWidth(0,table->width()-5);
     table->setItem(index,0,new QTableWidgetItem(path));
     // table->insertItem(index,path);
+}
+
+void MainWindow::AddPDFSlot(QString path,int page,int index)
+{
+    auto table = ui->photoTable;
+    table->setRowCount(table->rowCount()+1);
+    table->setRowHeight(index,40);
+    table->setColumnCount(2);
+    table->setColumnWidth(0,table->width()*0.8);
+    table->setColumnWidth(1,table->width()*0.1);
+    table->setHorizontalHeaderItem(1,new QTableWidgetItem("页码"));
+    table->setItem(index,0,new QTableWidgetItem(path));
+    table->setItem(index,1,new QTableWidgetItem(QString::number(page+1)));
 }
 
 void MainWindow::ClickDeleteButtonSlot()
@@ -119,9 +147,24 @@ void MainWindow::ClickDeleteButtonSlot()
 
 void MainWindow::ShowIcon()
 {
-    int index = ui->photoTable->currentRow();
-    QString fileName = ui->photoTable->item(index,0)->text();
-    QImage image(fileName);
+    auto table = ui->photoTable;
+    int index = table->currentRow();
+    QString fileName = table->item(index,0)->text();
+    QImage image;
+
+    if(table->columnCount() == 1 || table->item(index,1) == 0)
+    {
+        image = QImage(fileName);
+    }
+    else
+    {
+        int page = ui->photoTable->item(index,1)->text().toInt()-1;
+        QPdfDocument* document = new QPdfDocument;
+        document->load(fileName);
+        QSizeF size = document->pagePointSize(page);
+        image = document->render(page, QSize(size.width(), size.height()));
+        document->close();
+    }
     if (!image.isNull())
     {
         QPixmap pixmap = QPixmap::fromImage(image);
@@ -129,7 +172,8 @@ void MainWindow::ShowIcon()
         QTransform transform;
         transform.rotate(photoListManager->transformersList[index].rotation);
         QPixmap transformedPixmap = pixmap.transformed(transform);
-        QPixmap scaledPixmap = transformedPixmap.scaled(iconLabelSize, Qt::KeepAspectRatio, Qt::FastTransformation);
+        QPixmap scaledPixmap = transformedPixmap.scaled(iconLabelSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        // qDebug()<<scaledPixmap.size();
         ui->iconLabel->setPixmap(scaledPixmap);
     }
     else
@@ -160,6 +204,11 @@ void MainWindow::on_photoTable_currentItemChanged(QTableWidgetItem *current)
 
 void MainWindow::ClickClearButtonSlot()
 {
+    QMessageBox::StandardButton box;
+    box = QMessageBox::question(this, "提示", "确实要清空吗?", QMessageBox::Yes|QMessageBox::No);
+    if(box==QMessageBox::No)
+        return;
+
     auto table = ui->photoTable;
     table->clearContents();
     table->setRowCount(0);
@@ -251,7 +300,7 @@ void MainWindow::ClickedExportPDFButtonSlot()
         QMessageBox::information(this, "Error", "该路径不正确或没有写入权限");
         return;
     }
-    QStringList fileNames;
+    QStringList fileNames,pages;
     auto table = ui->photoTable;
     for (int row = 0; row < table->rowCount(); ++row)
     {
@@ -260,10 +309,18 @@ void MainWindow::ClickedExportPDFButtonSlot()
         {
             QString cellText = item->text();
             fileNames.append(cellText);
+            if(table->item(row,1) != 0)
+            {
+                pages.append(table->item(row,1)->text());
+            }
+            else
+            {
+                pages.append("");
+            }
         }
     }
     ShowProgressDialog(photoListManager->photoLength);
-    emit ExportPDFSignal(fileNames);
+    emit ExportPDFSignal(fileNames,pages);
 }
 
 void MainWindow::SetProgressValueSlot(int value)

@@ -48,15 +48,51 @@ void PhotoManager::AddPhotos()
     }
 }
 
+void PhotoManager::AddPDF()
+{
+    QStringList fileNames;
+    //定义文件对话框类
+    QFileDialog *fileDialog = new QFileDialog();
+    //定义文件对话框标题
+    fileDialog->setWindowTitle(QFileDialog::tr("打开图片"));
+    //设置默认文件路径
+    fileDialog->setDirectory(".");
+    //设置文件过滤器
+    fileDialog->setNameFilter(QFileDialog::tr("PDF(*.pdf *.PDF)"));
+    //设置可以选择多个文件,默认为只能选择一个文件QFileDialog::ExistingFiles
+    fileDialog->setFileMode(QFileDialog::ExistingFiles);
+    //设置视图模式
+    fileDialog->setViewMode(QFileDialog::Detail);
+    //打印所有选择的文件的路径
+    if(fileDialog->exec())
+    {
+        fileNames = fileDialog->selectedFiles();
+    }
+    if(fileNames.length()>0)
+    {
+        for(auto pdfFile:fileNames)
+        {
+            QPdfDocument* document = new QPdfDocument;
+            document->load(pdfFile);
+            int totalPage = document->pageCount();
+            for (int page = 0; page < totalPage; page++)
+            {
+                emit AddPDFSignal(pdfFile,page,photoLength);
+                photoLength++;
+                transformersList.append(Transformers());
+            }
+            document->close();
+        }
+    }
+}
 
-
-void PhotoManager::ExportPDFSlot(QStringList fileNames)
+void PhotoManager::ExportPDFSlot(QStringList fileNames,QStringList pages)
 {
     // 发送信号告知主线程操作开始
     emit SetProgressValueSignal(0);  // 可以初始化进度为0
 
     // 创建新的线程来执行导出PDF
-    ExportPDFWorker *worker = new ExportPDFWorker(fileNames, transformersList, config);
+    ExportPDFWorker *worker = new ExportPDFWorker(fileNames, pages, transformersList, config);
     connect(worker, &ExportPDFWorker::ProgressUpdatedSignal, this, &PhotoManager::UpdateProgress);
     connect(worker, &ExportPDFWorker::FinishedSignal, this, &PhotoManager::OnExportFinished);
     connect(worker, &ExportPDFWorker::ErrorOccurredSignal, this, &PhotoManager::OnErrorOccurred);

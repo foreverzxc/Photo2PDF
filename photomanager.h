@@ -27,6 +27,7 @@ public:
 
     PhotoManager(QObject *parent);
     void AddPhotos();
+    void AddPDF();
     void ExportPDF();
     void UpdateProgress(int current, int total);
     void OnErrorOccurred(const QString &message);
@@ -34,6 +35,7 @@ public:
 
 signals:
     void AddFileSignal(QString path,int index);
+    void AddPDFSignal(QString path,int page,int index);
     void SetProgressValueSignal(int value);
     void CloseProgressDialogSignal();
     void SetProgressMaxValueSignal(int maxValue);
@@ -43,7 +45,7 @@ signals:
 public slots:
     void SwapPhotosSlot(int a,int b);
     void SetRotationSlot(int angle,int index);
-    void ExportPDFSlot(QStringList fileNames);
+    void ExportPDFSlot(QStringList fileNames,QStringList pages);
     void SetConfigDpiSlot(int dpi);
     void SetConfigOutputPathSlot(QString path);
     void SetConfigResizeOptionSlot(ResizeOption resizeOption);

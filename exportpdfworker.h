@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QTransform>
 #include <QDebug>
+#include <QPdfDocument>
 //user
 #include "transformers.h"
 #include "config.h"
@@ -18,8 +19,8 @@ class ExportPDFWorker : public QThread
     Q_OBJECT
 
 public:
-    explicit ExportPDFWorker(const QStringList &fileNames, QList<Transformers> &transformersList,const ExportPDFConfig &config, QObject *parent = nullptr)
-        : QThread(parent), fileNames(fileNames), transformersList(transformersList), config(config) {}
+    explicit ExportPDFWorker(const QStringList &fileNames,const QStringList &pages, QList<Transformers> &transformersList,const ExportPDFConfig &config, QObject *parent = nullptr)
+        : QThread(parent), fileNames(fileNames), pages(pages),transformersList(transformersList), config(config) {}
 
 protected:
     void run() override {
@@ -34,7 +35,7 @@ signals:
 private:
     void ExportPDF() {
         QPdfWriter pdfWriter(config.outputPath);
-        pdfWriter.setResolution(config.dpi);  // 设置 DPI
+        pdfWriter.setResolution(72);  // 设置 DPI
         pdfWriter.setPageMargins(QMarginsF(0, 0, 0, 0));
 
         QPainter painter;
@@ -42,17 +43,32 @@ private:
         int totalFiles = fileNames.size();
         for (int i = 0; i < totalFiles; ++i) {
             imagePath = fileNames[i];
-            QImage image(imagePath);
+            QImage image;
+            if(pages[i]=="")
+            {
+                image = QImage(imagePath);
+            }
+            else
+            {
+                // qDebug()<<i+1<<'/'<<totalFiles;
+                int page = pages[i].toInt()-1;
+                QPdfDocument* document = new QPdfDocument;
+                document->load(imagePath);
+                QSizeF size = document->pagePointSize(page);
+                image = document->render(page, QSize(size.width(), size.height()));
+                document->close();
+            }
+
+            emit ProgressUpdatedSignal(i + 1, totalFiles);  // 更新进度
             if (image.isNull()) {
                 emit ErrorOccurredSignal("Failed to load image: " + imagePath);
                 continue;
             }
 
-            emit ProgressUpdatedSignal(i + 1, totalFiles);  // 更新进度
-
             QTransform transform;
             transform.rotate(transformersList[i].rotation);
             QImage transformedImage = image.transformed(transform);
+
 
             double scale = 1.0;
 
@@ -82,8 +98,10 @@ private:
             qreal dpi = config.dpi;
             qreal widthInMm = transformedImage.width() * 25.4 / dpi;
             qreal heightInMm = transformedImage.height() * 25.4 / dpi;
+            // qDebug()<<widthInMm<<" "<<heightInMm;
 
-            pdfWriter.setPageSize(QPageSize(QSizeF(widthInMm, heightInMm), QPageSize::Millimeter));
+            // pdfWriter.setPageSize(QPageSize(QSizeF(widthInMm, heightInMm), QPageSize::Millimeter,"",QPageSize::ExactMatch));
+            pdfWriter.setPageSize(QPageSize(transformedImage.size(),QPageSize::Point,"",QPageSize::ExactMatch));
 
             if (i == 0) {
                 if (!painter.begin(&pdfWriter)) {
@@ -94,8 +112,8 @@ private:
             } else {
                 pdfWriter.newPage();
             }
-
-            painter.drawImage(0, 0, transformedImage);
+            qDebug() << transformedImage.size();
+            painter.drawImage(QPoint(0,0), transformedImage);
         }
         painter.end();
 
@@ -104,6 +122,7 @@ private:
 
 private:
     QStringList fileNames;
+    QStringList pages;
     QList<Transformers> transformersList;
     ExportPDFConfig config;
 };
