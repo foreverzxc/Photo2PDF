@@ -34,8 +34,8 @@ public:
     void OnExportFinished();
 
 signals:
-    void AddFileSignal(QString path,int index);
-    void AddPDFSignal(QString path,int page,int index);
+    void AddPhotoRowSignal(QString path,int index);
+    void AddPDFRowSignal(QString path,QString page,int index);
     void SetProgressValueSignal(int value);
     void CloseProgressDialogSignal();
     void SetProgressMaxValueSignal(int maxValue);

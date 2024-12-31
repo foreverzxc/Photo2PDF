@@ -23,9 +23,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void AddPhoto(QString path,int index);
+    void AddARow(QString path,QString page,int index);
     void InitUI();
-    void ShowIcon();
+    void ShowPreview();
     void ShowProgressDialog(int maxValue);
     void resizeEvent(QResizeEvent * re);
 
@@ -58,8 +58,8 @@ private slots:
     void on_pixelLineEdit_textChanged(const QString &arg1);
     void on_noExpandCheckBox_checkStateChanged(const Qt::CheckState &arg1);
     //user
-    void AddPhotoSlot(QString path,int index);
-    void AddPDFSlot(QString path,int page,int index);
+    void AddPhotoRowSlot(QString path,int index);
+    void AddPDFRowSlot(QString path,QString page,int index);
     void SetProgressValueSlot(int value);
     void SetProgressMaxValueSlot(int maxValue);
     void CloseProgressDialogSlot();

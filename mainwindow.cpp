@@ -36,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     /**************** Backend -> Frontend ****************/
     //photoListManager -> MainWindow
-    connect(photoListManager,&PhotoManager::AddFileSignal,this,&MainWindow::AddPhotoSlot);
-    connect(photoListManager,&PhotoManager::AddPDFSignal,this,&MainWindow::AddPDFSlot);
+    connect(photoListManager,&PhotoManager::AddPhotoRowSignal,this,&MainWindow::AddPhotoRowSlot);
+    connect(photoListManager,&PhotoManager::AddPDFRowSignal,this,&MainWindow::AddPDFRowSlot);
     connect(photoListManager,&PhotoManager::SetProgressValueSignal,this,&MainWindow::SetProgressValueSlot);
     connect(photoListManager,&PhotoManager::SetProgressMaxValueSignal,this,&MainWindow::SetProgressMaxValueSlot);
     connect(photoListManager,&PhotoManager::CloseProgressDialogSignal,this,&MainWindow::CloseProgressDialogSlot);
@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     /**************** Frontend -> Frontend ****************/
     //photoTable -> MainWindow
-    connect(ui->photoTable,&TableWidgetUpDown::ShowIconSignal,this,&MainWindow::ShowIcon);
+    connect(ui->photoTable,&TableWidgetUpDown::ShowIconSignal,this,&MainWindow::ShowPreview);
 
 
     /**************** Backend -> Backend ****************/
@@ -64,6 +64,14 @@ void MainWindow::InitUI()
     left_rotation_icon.addPixmap(QPixmap(":/resource/left_rotation_icon.png"), QIcon::Normal, QIcon::On);
     ui->rightRotationButton->setIcon(right_rotation_icon);
     ui->leftRotationButton->setIcon(left_rotation_icon);
+
+    //配置table
+    auto table = ui->photoTable;
+    table->setColumnCount(2);
+    table->setColumnWidth(0,table->width()*0.8);
+    table->setColumnWidth(1,table->width()*0.1);
+    table->setHorizontalHeaderItem(0,new QTableWidgetItem("路径"));
+    table->setHorizontalHeaderItem(1,new QTableWidgetItem("页码"));
 
     ui->pixelLineEdit->setValidator(new QIntValidator(ui->pixelLineEdit));
 }
@@ -84,15 +92,9 @@ void MainWindow::resizeEvent(QResizeEvent * re)
     // iconLabelSize = ui->iconLabel->size();
     // qDebug()<<ui->photoTable->width()<<" "<<ui->photoTable->columnWidth(0)<< " "<< ui->photoTable->columnWidth(1);
     auto table = ui->photoTable;
-    if(table->columnCount()==1)
-    {
-        table->setColumnWidth(0,table->width());
-    }
-    else
-    {
-        table->setColumnWidth(0,table->width()*0.9);
-        table->setColumnWidth(1,table->width()*0.1);
-    }
+    table->setColumnWidth(0,table->width()*0.9);
+    table->setColumnWidth(1,table->width()*0.1);
+
 }
 
 MainWindow::~MainWindow()
@@ -103,35 +105,44 @@ MainWindow::~MainWindow()
 
 void MainWindow::ClickOpenFileButtonSlot()
 {
+    auto table = ui->photoTable;
+    table->setColumnWidth(0,table->width()*0.9);
+    table->setColumnWidth(1,table->width()*0.1);
     photoListManager->AddPhotos();
 }
 
 void MainWindow::ClickedOpenPDFButtonSlot()
 {
+    auto table = ui->photoTable;
+    table->setColumnWidth(0,table->width()*0.9);
+    table->setColumnWidth(1,table->width()*0.1);
     photoListManager->AddPDF();
 }
 
-void MainWindow::AddPhotoSlot(QString path,int index)
+void MainWindow::AddARow(QString path,QString page,int index)
 {
     auto table = ui->photoTable;
     table->setRowCount(table->rowCount()+1);
     table->setRowHeight(index,40);
-    table->setColumnWidth(0,table->width()-5);
     table->setItem(index,0,new QTableWidgetItem(path));
-    // table->insertItem(index,path);
+    if(page=="")
+    {
+        table->setItem(index,1,new QTableWidgetItem(""));
+    }
+    else
+    {
+        table->setItem(index,1,new QTableWidgetItem(page));
+    }
 }
 
-void MainWindow::AddPDFSlot(QString path,int page,int index)
+void MainWindow::AddPhotoRowSlot(QString path,int index)
 {
-    auto table = ui->photoTable;
-    table->setRowCount(table->rowCount()+1);
-    table->setRowHeight(index,40);
-    table->setColumnCount(2);
-    table->setColumnWidth(0,table->width()*0.8);
-    table->setColumnWidth(1,table->width()*0.1);
-    table->setHorizontalHeaderItem(1,new QTableWidgetItem("页码"));
-    table->setItem(index,0,new QTableWidgetItem(path));
-    table->setItem(index,1,new QTableWidgetItem(QString::number(page+1)));
+    AddARow(path,"",index);
+}
+
+void MainWindow::AddPDFRowSlot(QString path,QString page,int index)
+{
+    AddARow(path,QString::number(page.toInt() + 1),index);
 }
 
 void MainWindow::ClickDeleteButtonSlot()
@@ -145,14 +156,14 @@ void MainWindow::ClickDeleteButtonSlot()
     }
 }
 
-void MainWindow::ShowIcon()
+void MainWindow::ShowPreview()
 {
     auto table = ui->photoTable;
     int index = table->currentRow();
     QString fileName = table->item(index,0)->text();
     QImage image;
 
-    if(table->columnCount() == 1 || table->item(index,1) == 0)
+    if(table->item(index,1)->text() == "")
     {
         image = QImage(fileName);
     }
@@ -192,7 +203,7 @@ void MainWindow::on_photoTable_currentItemChanged(QTableWidgetItem *current)
     }
     if(current!=nullptr)
     {
-        ShowIcon();
+        ShowPreview();
     }
     else
     {
@@ -223,8 +234,10 @@ void MainWindow::ClickReverseButtonSlot()
     // 清空ab
     auto table = ui->photoTable;
     int rowCount = table->rowCount();
-    QList<QString> pathList;
-    for (int i = rowCount - 1; i >= 0; -- i){
+    QList<QString> pathList,pageList;
+    for (int i = rowCount - 1; i >= 0; -- i)
+    {
+        pageList.push_back(table->item(i, 1)->text());
         pathList.push_back(table->item(i, 0)->text());
         // qDebug() << "current row is:" << i << "->>" << table->item(i, 0)->text();
         table->removeRow(i);
@@ -232,7 +245,7 @@ void MainWindow::ClickReverseButtonSlot()
 
     // 重新添加
     for (int i = 0; i < rowCount; ++ i)
-        this->AddPhotoSlot(pathList[i], i);
+        AddARow(pathList[i],pageList[i], i);
 
     for(int i=0;i<rowCount/2;++i)
     {
@@ -245,7 +258,7 @@ void MainWindow::ClickRightRotationButtonSlot()
     if(ui->photoTable->currentItem()!=nullptr)
     {
         emit SetRotationSignal(90,ui->photoTable->currentRow());
-        ShowIcon();
+        ShowPreview();
     }
 }
 
@@ -254,7 +267,7 @@ void MainWindow::ClickLeftRotationButtonSlot()
     if(ui->photoTable->currentItem()!=nullptr)
     {
         emit SetRotationSignal(-90,ui->photoTable->currentRow());
-        ShowIcon();
+        ShowPreview();
     }
 }
 

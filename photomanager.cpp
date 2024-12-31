@@ -41,7 +41,7 @@ void PhotoManager::AddPhotos()
     {
         for(auto item:fileNames)
         {
-            emit AddFileSignal(item,photoLength);
+            emit AddPhotoRowSignal(item,photoLength);
             photoLength++;
             transformersList.append(Transformers());
         }
@@ -77,7 +77,7 @@ void PhotoManager::AddPDF()
             int totalPage = document->pageCount();
             for (int page = 0; page < totalPage; page++)
             {
-                emit AddPDFSignal(pdfFile,page,photoLength);
+                emit AddPDFRowSignal(pdfFile,QString::number(page),photoLength);
                 photoLength++;
                 transformersList.append(Transformers());
             }

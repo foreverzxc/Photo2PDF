@@ -95,9 +95,9 @@ private:
                 transformedImage = transformedImage.scaled(transformedImage.size()*scale);
             }
 
-            qreal dpi = config.dpi;
-            qreal widthInMm = transformedImage.width() * 25.4 / dpi;
-            qreal heightInMm = transformedImage.height() * 25.4 / dpi;
+            // qreal dpi = config.dpi;
+            // qreal widthInMm = transformedImage.width() * 25.4 / dpi;
+            // qreal heightInMm = transformedImage.height() * 25.4 / dpi;
             // qDebug()<<widthInMm<<" "<<heightInMm;
 
             // pdfWriter.setPageSize(QPageSize(QSizeF(widthInMm, heightInMm), QPageSize::Millimeter,"",QPageSize::ExactMatch));
