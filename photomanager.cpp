@@ -40,7 +40,7 @@ void PhotoManager::AddPDFs()
     //定义文件对话框类
     QFileDialog *fileDialog = new QFileDialog();
     //定义文件对话框标题
-    fileDialog->setWindowTitle(QFileDialog::tr("打开图片"));
+    fileDialog->setWindowTitle(QFileDialog::tr("打开PDF"));
     //设置默认文件路径
     fileDialog->setDirectory(".");
     //设置文件过滤器

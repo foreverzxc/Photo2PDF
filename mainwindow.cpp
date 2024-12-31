@@ -255,13 +255,6 @@ void MainWindow::ClickLeftRotationButtonSlot()
     }
 }
 
-bool IsDirWritable(const QString& dir)
-{
-    qDebug() << dir+"\XXXXXX";
-    auto testFile = QTemporaryFile::createNativeFile(dir+"\XXXXXX");
-    return testFile->open();
-}
-
 void MainWindow::ClickedExportPDFButtonSlot()
 {
     QNtfsPermissionCheckGuard permissionGuard;
