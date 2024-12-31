@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -254,9 +255,18 @@ void MainWindow::ClickLeftRotationButtonSlot()
     }
 }
 
+bool IsDirWritable(const QString& dir)
+{
+    qDebug() << dir+"\XXXXXX";
+    auto testFile = QTemporaryFile::createNativeFile(dir+"\XXXXXX");
+    return testFile->open();
+}
+
 void MainWindow::ClickedExportPDFButtonSlot()
 {
+    QNtfsPermissionCheckGuard permissionGuard;
     QFileInfo fileInfo(ui->savePathEdit->text());
+    fileInfo = QFileInfo(fileInfo.dir().path());
     if(ui->savePathEdit->text().isEmpty())
     {
         QMessageBox::information(this, "Error", "请输入保存地址");

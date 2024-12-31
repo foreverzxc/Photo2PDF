@@ -8,6 +8,7 @@
 #include <QSize>
 #include <QTableWidgetItem>
 #include <QProgressDialog>
+#include <QTemporaryFile>
 //user
 #include "photomanager.h"
 
