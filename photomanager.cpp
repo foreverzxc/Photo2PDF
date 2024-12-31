@@ -1,21 +1,7 @@
 #include "photomanager.h"
 
 
-PhotoManager::PhotoManager(QObject *parent): QObject(parent)
-{
-
-}
-
-void PhotoManager::SwapPhotosSlot(int a,int b)
-{
-    transformersList.swapItemsAt(a,b);
-}
-
-void PhotoManager::SetRotationSlot(int angle,int index)
-{
-    transformersList[index].rotation += angle;
-    transformersList[index].rotation %= 360;
-}
+PhotoManager::PhotoManager(QObject *parent): QObject(parent){}
 
 void PhotoManager::AddPhotos()
 {
@@ -48,7 +34,7 @@ void PhotoManager::AddPhotos()
     }
 }
 
-void PhotoManager::AddPDF()
+void PhotoManager::AddPDFs()
 {
     QStringList fileNames;
     //定义文件对话框类
@@ -101,6 +87,17 @@ void PhotoManager::ExportPDFSlot(QStringList fileNames,QStringList pages)
     worker->start();
 }
 
+void PhotoManager::SwapPhotosSlot(int a,int b)
+{
+    transformersList.swapItemsAt(a,b);
+}
+
+void PhotoManager::SetRotationSlot(int angle,int index)
+{
+    transformersList[index].rotation += angle;
+    transformersList[index].rotation %= 360;
+}
+
 // 更新进度条
 void PhotoManager::UpdateProgress(int current, int total)
 {
@@ -122,6 +119,7 @@ void PhotoManager::OnErrorOccurred(const QString &message)
     qWarning() << "Error during PDF export: " << message;
 }
 
+/**************************** set a variable ****************************/
 void PhotoManager::SetConfigDpiSlot(int dpi)
 {
     config.dpi = dpi;

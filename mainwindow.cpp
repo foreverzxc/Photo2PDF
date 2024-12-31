@@ -53,9 +53,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     InitUI();
-
+}
+MainWindow::~MainWindow()
+{
+    delete ui;
+    delete photoListManager;
 }
 
+/************************************************ user define function ************************************************/
 void MainWindow::InitUI()
 {
     setWindowTitle("Photo2PDF ---- by zxc Email:forever__zxc@163.com");
@@ -76,49 +81,6 @@ void MainWindow::InitUI()
     ui->pixelLineEdit->setValidator(new QIntValidator(ui->pixelLineEdit));
 }
 
-void MainWindow::ShowProgressDialog(int maxValue)
-{
-    progressDialog = new QProgressDialog("任务进行中...", "取消", 0, maxValue, this);
-    progressDialog->setWindowModality(Qt::WindowModal);
-    progressDialog->setAutoClose(true);
-    progressDialog->setCancelButton(nullptr);
-    // progressDialog->setRange(0,maxValue);//设置进度条范围
-    progressDialog->show();
-}
-
-void MainWindow::resizeEvent(QResizeEvent * re)
-{
-    // iconLabelFlag = false;
-    // iconLabelSize = ui->iconLabel->size();
-    // qDebug()<<ui->photoTable->width()<<" "<<ui->photoTable->columnWidth(0)<< " "<< ui->photoTable->columnWidth(1);
-    auto table = ui->photoTable;
-    table->setColumnWidth(0,table->width()*0.9);
-    table->setColumnWidth(1,table->width()*0.1);
-
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-    delete photoListManager;
-}
-
-void MainWindow::ClickOpenFileButtonSlot()
-{
-    auto table = ui->photoTable;
-    table->setColumnWidth(0,table->width()*0.9);
-    table->setColumnWidth(1,table->width()*0.1);
-    photoListManager->AddPhotos();
-}
-
-void MainWindow::ClickedOpenPDFButtonSlot()
-{
-    auto table = ui->photoTable;
-    table->setColumnWidth(0,table->width()*0.9);
-    table->setColumnWidth(1,table->width()*0.1);
-    photoListManager->AddPDF();
-}
-
 void MainWindow::AddARow(QString path,QString page,int index)
 {
     auto table = ui->photoTable;
@@ -135,27 +97,30 @@ void MainWindow::AddARow(QString path,QString page,int index)
     }
 }
 
-void MainWindow::AddPhotoRowSlot(QString path,int index)
+/**************************** show progress ****************************/
+void MainWindow::ShowProgressDialog(int maxValue)
 {
-    AddARow(path,"",index);
+    progressDialog = new QProgressDialog("任务进行中...", "取消", 0, maxValue, this);
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->setAutoClose(true);
+    progressDialog->setCancelButton(nullptr);
+    // progressDialog->setRange(0,maxValue);//设置进度条范围
+    progressDialog->show();
+}
+void MainWindow::SetProgressValueSlot(int value)
+{
+    progressDialog->setValue(value);
+}
+void MainWindow::SetProgressMaxValueSlot(int maxValue)
+{
+    progressDialog->setMaximum(maxValue);
+}
+void MainWindow::CloseProgressDialogSlot()
+{
+    progressDialog->close();
 }
 
-void MainWindow::AddPDFRowSlot(QString path,QString page,int index)
-{
-    AddARow(path,QString::number(page.toInt() + 1),index);
-}
-
-void MainWindow::ClickDeleteButtonSlot()
-{
-    int currentRow = ui->photoTable->currentRow();
-    if (currentRow != -1)
-    {
-        ui->photoTable->removeRow(currentRow);
-        photoListManager->photoLength--;
-        photoListManager->transformersList.removeAt(currentRow);
-    }
-}
-
+/**************************** show preview ****************************/
 void MainWindow::ShowPreview()
 {
     auto table = ui->photoTable;
@@ -191,27 +156,45 @@ void MainWindow::ShowPreview()
     {
         QMessageBox::information(this, tr("Open Image"), tr("Cannot load the image."));
     }
-
 }
 
-void MainWindow::on_photoTable_currentItemChanged(QTableWidgetItem *current)
+/************************************************ click a button slot ************************************************/
+void MainWindow::ClickOpenFileButtonSlot()
 {
-    if(!iconLabelFlag)
-    {
-        iconLabelFlag=true;
-        iconLabelSize = ui->iconLabel->size();
-    }
-    if(current!=nullptr)
-    {
-        ShowPreview();
-    }
-    else
-    {
-        ui->iconLabel->clear();
-        ui->photoPixelInfoLabel->setText("当前图片大小为：");
-    }
+    auto table = ui->photoTable;
+    table->setColumnWidth(0,table->width()*0.9);
+    table->setColumnWidth(1,table->width()*0.1);
+    photoListManager->AddPhotos();
 }
 
+void MainWindow::ClickedOpenPDFButtonSlot()
+{
+    auto table = ui->photoTable;
+    table->setColumnWidth(0,table->width()*0.9);
+    table->setColumnWidth(1,table->width()*0.1);
+    photoListManager->AddPDFs();
+}
+
+void MainWindow::AddPhotoRowSlot(QString path,int index)
+{
+    AddARow(path,"",index);
+}
+
+void MainWindow::AddPDFRowSlot(QString path,QString page,int index)
+{
+    AddARow(path,QString::number(page.toInt() + 1),index);
+}
+
+void MainWindow::ClickDeleteButtonSlot()
+{
+    int currentRow = ui->photoTable->currentRow();
+    if (currentRow != -1)
+    {
+        ui->photoTable->removeRow(currentRow);
+        photoListManager->photoLength--;
+        photoListManager->transformersList.removeAt(currentRow);
+    }
+}
 
 void MainWindow::ClickClearButtonSlot()
 {
@@ -271,33 +254,9 @@ void MainWindow::ClickLeftRotationButtonSlot()
     }
 }
 
-void MainWindow::on_comboBox_currentIndexChanged(int index)
-{
-    auto pixelLineEdit = ui->pixelLineEdit;
-    auto noExpandCheckBox = ui->noExpandCheckBox;
-    switch (index)
-    {
-    case 0://不改变分辨率
-        pixelLineEdit->setEnabled(false);
-        noExpandCheckBox->setEnabled(false);
-        emit SetConfigResizeOptionSignal(ResizeOption::NoResize);
-        break;
-    case 1://设置短边
-        pixelLineEdit->setEnabled(true);
-        noExpandCheckBox->setEnabled(true);
-        emit SetConfigResizeOptionSignal(ResizeOption::ResizeShortSide);
-        break;
-    case 2://设置长边
-        pixelLineEdit->setEnabled(true);
-        noExpandCheckBox->setEnabled(true);
-        emit SetConfigResizeOptionSignal(ResizeOption::ResizeLongSide);
-        break;
-    }
-}
-
 void MainWindow::ClickedExportPDFButtonSlot()
 {
-    QDir dir(ui->savePathEdit->text());
+    QFileInfo fileInfo(ui->savePathEdit->text());
     if(ui->savePathEdit->text().isEmpty())
     {
         QMessageBox::information(this, "Error", "请输入保存地址");
@@ -308,7 +267,7 @@ void MainWindow::ClickedExportPDFButtonSlot()
         QMessageBox::information(this, "Error", "请打开至少一个文件");
         return;
     }
-    if(!dir.Writable)
+    if(!fileInfo.isWritable())
     {
         QMessageBox::information(this, "Error", "该路径不正确或没有写入权限");
         return;
@@ -336,21 +295,6 @@ void MainWindow::ClickedExportPDFButtonSlot()
     emit ExportPDFSignal(fileNames,pages);
 }
 
-void MainWindow::SetProgressValueSlot(int value)
-{
-    progressDialog->setValue(value);
-}
-
-void MainWindow::SetProgressMaxValueSlot(int maxValue)
-{
-    progressDialog->setMaximum(maxValue);
-}
-
-void MainWindow::CloseProgressDialogSlot()
-{
-    progressDialog->close();
-}
-
 void MainWindow::ClickedSelectSavePathButtonSlot()
 {
     QString path = QFileDialog::getSaveFileName(this, tr("选择保存路径"), ".", tr("*.pdf"));
@@ -363,6 +307,59 @@ void MainWindow::ClickedSelectSavePathButtonSlot()
         path += ".pdf";
     }
     ui->savePathEdit->setText(path);
+}
+
+/************************************************ Qt define methods ************************************************/
+void MainWindow::resizeEvent(QResizeEvent * re)
+{
+    // iconLabelFlag = false;
+    // iconLabelSize = ui->iconLabel->size();
+    // qDebug()<<ui->photoTable->width()<<" "<<ui->photoTable->columnWidth(0)<< " "<< ui->photoTable->columnWidth(1);
+    auto table = ui->photoTable;
+    table->setColumnWidth(0,table->width()*0.9);
+    table->setColumnWidth(1,table->width()*0.1);
+}
+
+void MainWindow::on_photoTable_currentItemChanged(QTableWidgetItem *current)
+{
+    if(!iconLabelFlag)
+    {
+        iconLabelFlag=true;
+        iconLabelSize = ui->iconLabel->size();
+    }
+    if(current!=nullptr)
+    {
+        ShowPreview();
+    }
+    else
+    {
+        ui->iconLabel->clear();
+        ui->photoPixelInfoLabel->setText("当前图片大小为：");
+    }
+}
+
+void MainWindow::on_comboBox_currentIndexChanged(int index)
+{
+    auto pixelLineEdit = ui->pixelLineEdit;
+    auto noExpandCheckBox = ui->noExpandCheckBox;
+    switch (index)
+    {
+    case 0://不改变分辨率
+        pixelLineEdit->setEnabled(false);
+        noExpandCheckBox->setEnabled(false);
+        emit SetConfigResizeOptionSignal(ResizeOption::NoResize);
+        break;
+    case 1://设置短边
+        pixelLineEdit->setEnabled(true);
+        noExpandCheckBox->setEnabled(true);
+        emit SetConfigResizeOptionSignal(ResizeOption::ResizeShortSide);
+        break;
+    case 2://设置长边
+        pixelLineEdit->setEnabled(true);
+        noExpandCheckBox->setEnabled(true);
+        emit SetConfigResizeOptionSignal(ResizeOption::ResizeLongSide);
+        break;
+    }
 }
 
 void MainWindow::on_savePathEdit_textChanged()

@@ -9,8 +9,6 @@ TableWidgetUpDown::TableWidgetUpDown(QWidget *parent) : QTableWidget(parent)
     this->setDropIndicatorShown(true);  // drop位置 提示
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->setSelectionMode(QAbstractItemView::SingleSelection);
-
-
 }
 
 

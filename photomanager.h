@@ -27,7 +27,7 @@ public:
 
     PhotoManager(QObject *parent);
     void AddPhotos();
-    void AddPDF();
+    void AddPDFs();
     void ExportPDF();
     void UpdateProgress(int current, int total);
     void OnErrorOccurred(const QString &message);

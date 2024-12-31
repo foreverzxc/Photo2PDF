@@ -8,7 +8,7 @@ class Transformers
 public:
     int rotation=0;
 public:
-    Transformers();
+    Transformers(){}
 };
 
 #endif // TRANSFORMERS_H

@@ -13,8 +13,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     photomanager.cpp \
-    tablewidgetupdown.cpp \
-    transformers.cpp
+    tablewidgetupdown.cpp
 
 HEADERS += \
     config.h \
