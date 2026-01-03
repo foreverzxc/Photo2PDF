@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_CN">
+<TS version="2.1" language="en">
 <context>
     <name>MainWindow</name>
     <message>
         <source>Language</source>
-        <translation>语言</translation>
+        <translation>Language</translation>
     </message>
     <message>
         <source>简体中文</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>关于 Photo2PDF</source>
-        <translation>关于 Photo2PDF</translation>
+        <translation>About Photo2PDF</translation>
     </message>
     <message>
         <source>Photo2PDF
@@ -34,152 +34,152 @@
 Version 1.0</source>
         <translation>Photo2PDF
 
-一个简单易用的图片转PDF工具。
+A simple and easy-to-use image to PDF converter.
 
-支持功能：
-• 导入图片文件 (PNG, JPG, BMP等)
-• 导入PDF文件 (每一页都会解析成一张图片)
-• 调整图片顺序
-• 旋转图片
-• 导出为PDF
+Features:
+• Import image files (PNG, JPG, BMP, etc.)
+• Import PDF files (each page is parsed as an image)
+• Reorder images
+• Rotate images
+• Export to PDF
 
 Version 1.0</translation>
     </message>
     <message>
         <source>错误</source>
-        <translation>错误</translation>
+        <translation>Error</translation>
     </message>
     <message>
         <source>请先设置保存路径</source>
-        <translation>请先设置保存路径</translation>
+        <translation>Please set save path first</translation>
     </message>
     <message>
         <source>没有可导出的图片</source>
-        <translation>没有可导出的图片</translation>
+        <translation>No images to export</translation>
     </message>
     <message>
         <source>完成</source>
-        <translation>完成</translation>
+        <translation>Complete</translation>
     </message>
     <message>
         <source>PDF导出完成！</source>
-        <translation>PDF导出完成！</translation>
+        <translation>PDF export completed!</translation>
     </message>
     <message>
         <source>导出失败：</source>
-        <translation>导出失败：</translation>
+        <translation>Export failed: </translation>
     </message>
     <message>
         <source>提示</source>
-        <translation>提示</translation>
+        <translation>Prompt</translation>
     </message>
     <message>
         <source>确定要清空所有图片吗？</source>
-        <translation>确定要清空所有图片吗？</translation>
+        <translation>Are you sure to clear all images?</translation>
     </message>
     <message>
         <source>选择保存路径</source>
-        <translation>选择保存路径</translation>
+        <translation>Select save path</translation>
     </message>
     <message>
         <source>PDF文件 (*.pdf)</source>
-        <translation>PDF文件 (*.pdf)</translation>
+        <translation>PDF files (*.pdf)</translation>
     </message>
     <message>
         <source>请输入保存路径</source>
-        <translation>请输入保存路径</translation>
+        <translation>Please enter save path</translation>
     </message>
     <message>
         <source>保存路径无效或无写入权限</source>
-        <translation>保存路径无效或无写入权限</translation>
+        <translation>Invalid save path or no write permission</translation>
     </message>
     <message>
         <source>请添加至少一张图片</source>
-        <translation>请添加至少一张图片</translation>
+        <translation>Please add at least one image</translation>
     </message>
     <message>
         <source>打开图片</source>
-        <translation>打开图片</translation>
+        <translation>Open Images</translation>
     </message>
     <message>
         <source>Images(*.png *.jpg *.jpeg *.bmp)</source>
-        <translation>图片文件 (*.png *.jpg *.jpeg *.bmp)</translation>
+        <translation>Images (*.png *.jpg *.jpeg *.bmp)</translation>
     </message>
     <message>
         <source>打开PDF</source>
-        <translation>打开PDF</translation>
+        <translation>Open PDF</translation>
     </message>
     <message>
         <source>PDF(*.pdf *.PDF)</source>
-        <translation>PDF文件 (*.pdf *.PDF)</translation>
+        <translation>PDF files (*.pdf *.PDF)</translation>
     </message>
     <message>
         <source>删除一行</source>
-        <translation>删除一行</translation>
+        <translation>Delete Row</translation>
     </message>
     <message>
         <source>倒序</source>
-        <translation>倒序</translation>
+        <translation>Reverse</translation>
     </message>
     <message>
         <source>清空</source>
-        <translation>清空</translation>
+        <translation>Clear All</translation>
     </message>
     <message>
         <source>导出PDF</source>
-        <translation>导出PDF</translation>
+        <translation>Export PDF</translation>
     </message>
     <message>
         <source>逆时针旋转</source>
-        <translation>逆时针旋转</translation>
+        <translation>Rotate Left</translation>
     </message>
     <message>
         <source>顺时针旋转</source>
-        <translation>顺时针旋转</translation>
+        <translation>Rotate Right</translation>
     </message>
     <message>
         <source>编辑图片</source>
-        <translation>编辑图片</translation>
+        <translation>Edit Image</translation>
     </message>
     <message>
         <source>预览图</source>
-        <translation>预览图</translation>
+        <translation>Preview</translation>
     </message>
     <message>
         <source>设置</source>
-        <translation>设置</translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <source>不改变图片分辨率</source>
-        <translation>不改变图片分辨率</translation>
+        <translation>Original Size</translation>
     </message>
     <message>
         <source>短边长度设置为：</source>
-        <translation>短边长度设置为：</translation>
+        <translation>Short Side:</translation>
     </message>
     <message>
         <source>长边长度设置为：</source>
-        <translation>长边长度设置为：</translation>
+        <translation>Long Side:</translation>
     </message>
     <message>
         <source>px</source>
-        <translation>像素</translation>
+        <translation>px</translation>
     </message>
     <message>
         <source>不扩大</source>
-        <translation>不扩大</translation>
+        <translation>Don't enlarge</translation>
     </message>
     <message>
         <source>当前图片大小为：</source>
-        <translation>当前图片大小为：</translation>
+        <translation>Current image size:</translation>
     </message>
     <message>
         <source>图片地址</source>
-        <translation>图片地址</translation>
+        <translation>Image Path</translation>
     </message>
     <message>
         <source>语言</source>
-        <translation>语言</translation>
+        <translation>Language</translation>
     </message>
 </context>
 </TS>

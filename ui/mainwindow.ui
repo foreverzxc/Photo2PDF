@@ -267,7 +267,7 @@
            </size>
           </property>
           <property name="text">
-           <string>打开文件图片</string>
+           <string>打开图片</string>
           </property>
          </widget>
         </item>
@@ -299,7 +299,7 @@
            </size>
           </property>
           <property name="text">
-           <string>删除</string>
+           <string>删除一行</string>
           </property>
          </widget>
         </item>
@@ -312,7 +312,7 @@
            </size>
           </property>
           <property name="text">
-           <string>反转(倒序)</string>
+           <string>倒序</string>
           </property>
          </widget>
         </item>
@@ -363,14 +363,32 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuabout">
+   <widget class="QMenu" name="menuLanguage">
     <property name="title">
-     <string>about</string>
+     <string>Language</string>
     </property>
+    <addaction name="actionChinese"/>
+    <addaction name="actionEnglish"/>
    </widget>
-   <addaction name="menuabout"/>
+   <addaction name="actionAbout"/>
+   <addaction name="menuLanguage"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionAbout">
+   <property name="text">
+    <string>about</string>
+   </property>
+  </action>
+  <action name="actionChinese">
+   <property name="text">
+    <string>简体中文</string>
+   </property>
+  </action>
+  <action name="actionEnglish">
+   <property name="text">
+    <string>English</string>
+   </property>
+  </action>
   <action name="action">
    <property name="text">
     <string>打开文件</string>

@@ -29,17 +29,21 @@ HEADERS += \
     src/settings.h
 
 RESOURCES += \
-    resources/icon.qrc
+    resources/icon.qrc \
+    resources/translations.qrc
 
 FORMS += \
     ui/mainwindow.ui
 
+# Include path for custom widgets in UI files
+INCLUDEPATH += $$PWD/src
+
 TRANSLATIONS += \
-    translations/Photo2PDF_zh_CN.ts
+    translations/Photo2PDF_zh_CN.ts \
+    translations/Photo2PDF_en.ts
 
 TRANSLATIONS_DIR = $$PWD/translations
 CONFIG += lrelease
-CONFIG += embed_translations
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

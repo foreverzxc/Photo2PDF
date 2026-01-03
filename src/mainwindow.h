@@ -6,6 +6,7 @@
 #include <QSize>
 #include <QProgressDialog>
 #include <QModelIndex>
+#include <QTranslator>
 
 #include "photomanager.h"
 #include "photomodel.h"
@@ -62,6 +63,14 @@ private slots:
     void onExportFinished();
     void onExportError(const QString& message);
 
+    // About menu
+    void onAboutActionTriggered();
+
+    // Language switching
+    void onChineseTriggered();
+    void onEnglishTriggered();
+    void switchLanguage(const QString& language);
+
 private:
     Ui::MainWindow* ui;
     PhotoManager* photoManager;
@@ -71,6 +80,7 @@ private:
     QSize iconLabelSize;
     bool iconLabelFlag = false;
     QProgressDialog* progressDialog = nullptr;
+    QTranslator translator;
 
     // Helper methods
     void setupConnections();

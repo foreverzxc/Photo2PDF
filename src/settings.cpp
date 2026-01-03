@@ -133,6 +133,16 @@ void Settings::setLastSaveDirectory(const QString& dir)
     m_settings.setValue("Paths/lastSaveDir", dir);
 }
 
+QString Settings::language() const
+{
+    return m_settings.value("Language", "").toString();
+}
+
+void Settings::setLanguage(const QString& language)
+{
+    m_settings.setValue("Language", language);
+}
+
 void Settings::sync()
 {
     m_settings.sync();

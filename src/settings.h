@@ -50,6 +50,10 @@ public:
     QString lastSaveDirectory() const;
     void setLastSaveDirectory(const QString& dir);
 
+    // Language settings
+    QString language() const;
+    void setLanguage(const QString& language);
+
     // Utility
     void sync();
     void load();

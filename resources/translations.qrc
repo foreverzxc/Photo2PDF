@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource prefix="/i18n">
+<file>translations/Photo2PDF_en.qm</file>
+<file>translations/Photo2PDF_zh_CN.qm</file>
+</qresource>
+</RCC>

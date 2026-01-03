@@ -94,29 +94,33 @@ bool PhotoModel::moveRows(const QModelIndex& sourceParent, int sourceRow, int co
         return false;
     }
 
-    beginMoveRows(QModelIndex(), sourceRow, sourceRow + count - 1,
-                  QModelIndex(), destinationChild);
+    // 使用 beginResetModel/endResetModel 避免复杂的 beginMoveRows 语义问题
+    beginResetModel();
 
+    // Save items to move
     QList<PhotoItem> itemsToMove;
     for (int i = 0; i < count; ++i) {
         itemsToMove.append(m_items.at(sourceRow + i));
     }
 
-    // Remove from source
+    // Remove from source (in reverse order)
     for (int i = count - 1; i >= 0; --i) {
         m_items.removeAt(sourceRow + i);
     }
 
-    // Insert at destination
+    // Calculate actual insert position (adjust for removed items)
     int insertPos = destinationChild;
     if (sourceRow < destinationChild) {
+        // Moving down, destinationChild was calculated after source was removed
         insertPos = destinationChild - count;
     }
+
+    // Insert at calculated position
     for (const PhotoItem& item : itemsToMove) {
         m_items.insert(insertPos++, item);
     }
 
-    endMoveRows();
+    endResetModel();
     return true;
 }
 

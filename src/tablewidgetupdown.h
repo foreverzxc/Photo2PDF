@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTableWidget>
 #include <QDropEvent>
+#include <QMouseEvent>
 
 class TableWidgetUpDown : public QTableWidget
 {
@@ -17,6 +18,10 @@ public:
 
 protected:
     void dropEvent(QDropEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+
+private:
+    int m_dragStartRow = -1;  // Record the row where drag started
 };
 
 #endif // TABLEWIDGETUPDOWN_H

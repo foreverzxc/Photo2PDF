@@ -14,7 +14,7 @@ QString PhotoItem::displayName() const
     QString name = info.fileName();
 
     if (m_type == Type::PdfPage) {
-        name += QString(" (第%1页)").arg(m_pageNumber + 1);
+        name += QString(" (Page %1)").arg(m_pageNumber + 1);
     }
 
     return name;

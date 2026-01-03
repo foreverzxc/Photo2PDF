@@ -28,6 +28,22 @@ MainWindow::MainWindow(QWidget* parent)
     setupConnections();
     initUI();
     loadSettings();
+
+    // Initialize language checkmarks and menu titles
+    QString currentLang = settings.language();
+    if (currentLang == "en") {
+        ui->actionChinese->setText("简体中文");
+        ui->actionEnglish->setText("✓ English");
+        // Menu title opposite to current language
+        ui->menuLanguage->setTitle("语言");
+        ui->actionAbout->setText("About Photo2PDF");
+    } else {
+        ui->actionChinese->setText("✓ 简体中文");
+        ui->actionEnglish->setText("English");
+        // Menu title opposite to current language
+        ui->menuLanguage->setTitle("Language");
+        ui->actionAbout->setText("关于 Photo2PDF");
+    }
 }
 
 MainWindow::~MainWindow()
@@ -81,6 +97,13 @@ void MainWindow::setupConnections()
     connect(photoManager, &PhotoManager::exportProgressSignal, this, &MainWindow::onExportProgress);
     connect(photoManager, &PhotoManager::exportFinishedSignal, this, &MainWindow::onExportFinished);
     connect(photoManager, &PhotoManager::exportErrorSignal, this, &MainWindow::onExportError);
+
+    // About menu action
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onAboutActionTriggered);
+
+    // Language switching actions
+    connect(ui->actionChinese, &QAction::triggered, this, &MainWindow::onChineseTriggered);
+    connect(ui->actionEnglish, &QAction::triggered, this, &MainWindow::onEnglishTriggered);
 
     // TableWidgetUpDown signals (for drag-drop reordering)
     connect(ui->photoTable, &TableWidgetUpDown::swapPhotosSignal,
@@ -194,7 +217,7 @@ void MainWindow::showPreview(const QModelIndex& index)
 {
     if (!index.isValid() || index.row() >= photoModel->rowCount()) {
         ui->iconLabel->clear();
-        ui->photoPixelInfoLabel->setText("当前图片大小为：");
+        ui->photoPixelInfoLabel->setText(tr("当前图片大小为："));
         return;
     }
 
@@ -216,7 +239,7 @@ void MainWindow::showPreview(const QModelIndex& index)
     }
 
     // Update pixel info
-    ui->photoPixelInfoLabel->setText("当前图片大小为：" +
+    ui->photoPixelInfoLabel->setText(tr("当前图片大小为：") +
                                       QString::number(image.width()) + "×" +
                                       QString::number(image.height()));
 
@@ -332,7 +355,7 @@ void MainWindow::onCurrentCellChanged(int currentRow, int currentColumn, int pre
         showPreview(photoModel->index(currentRow));
     } else {
         ui->iconLabel->clear();
-        ui->photoPixelInfoLabel->setText("当前图片大小为：");
+        ui->photoPixelInfoLabel->setText(tr("当前图片大小为："));
     }
 }
 
@@ -467,6 +490,68 @@ void MainWindow::onExportError(const QString& message)
         progressDialog = nullptr;
     }
     QMessageBox::warning(this, tr("错误"), tr("导出失败：") + message);
+}
+
+void MainWindow::onAboutActionTriggered()
+{
+    QMessageBox::about(this, tr("关于 Photo2PDF"),
+        tr("Photo2PDF\n\n"
+           "一个简单易用的图片转PDF工具。\n\n"
+           "支持功能：\n"
+           "• 导入图片文件 (PNG, JPG, BMP等)\n"
+           "• 导入PDF文件 (每一页都会解析成一张图片)\n"
+           "• 调整图片顺序\n"
+           "• 旋转图片\n"
+           "• 导出为PDF\n\n"
+           "Version 1.0"));
+}
+
+void MainWindow::onChineseTriggered()
+{
+    switchLanguage("zh_CN");
+}
+
+void MainWindow::onEnglishTriggered()
+{
+    switchLanguage("en");
+}
+
+void MainWindow::switchLanguage(const QString& language)
+{
+    // Remove old translator
+    qApp->removeTranslator(&translator);
+
+    // Save language preference
+    settings.setLanguage(language);
+
+    // Load new translator from embedded resources
+    if (translator.load(":/i18n/translations/Photo2PDF_" + language + ".qm")) {
+        qApp->installTranslator(&translator);
+        qDebug() << "Switched to language:" << language;
+    } else {
+        qDebug() << "Failed to load translation for:" << language;
+    }
+
+    // Force UI retranslation first (translates all standard UI elements)
+    ui->retranslateUi(this);
+
+    // Then update checkmarks for language menu items (after retranslateUi)
+    if (language == "zh_CN") {
+        ui->actionChinese->setText("✓ 简体中文");
+        ui->actionEnglish->setText("English");
+        // Menu title opposite to current language
+        ui->menuLanguage->setTitle("Language");
+        ui->actionAbout->setText("关于 Photo2PDF");
+    } else {
+        ui->actionChinese->setText("简体中文");
+        ui->actionEnglish->setText("✓ English");
+        // Menu title opposite to current language
+        ui->menuLanguage->setTitle("语言");
+        ui->actionAbout->setText("About Photo2PDF");
+    }
+
+    // Update window title
+    setWindowTitle("Photo2PDF");
 }
 
 // Helper methods
