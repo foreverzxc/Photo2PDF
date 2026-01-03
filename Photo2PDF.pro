@@ -8,29 +8,36 @@ CONFIG += c++17
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    photomanager.cpp \
-    tablewidgetupdown.cpp
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/photomanager.cpp \
+    src/tablewidgetupdown.cpp \
+    src/photoitem.cpp \
+    src/photomodel.cpp \
+    src/settings.cpp
 
 HEADERS += \
-    config.h \
-    exportpdfworker.h \
-    mainwindow.h \
-    photomanager.h \
-    tablewidgetupdown.h \
-    transformers.h
+    src/config.h \
+    src/exportpdfworker.h \
+    src/mainwindow.h \
+    src/photomanager.h \
+    src/tablewidgetupdown.h \
+    src/transformers.h \
+    src/photoitem.h \
+    src/photomodel.h \
+    src/settings.h
 
 RESOURCES += \
-    icon.qrc
+    resources/icon.qrc
 
 FORMS += \
-    mainwindow.ui
+    ui/mainwindow.ui
 
 TRANSLATIONS += \
-    Photo2PDF_zh_CN.ts
+    translations/Photo2PDF_zh_CN.ts
+
+TRANSLATIONS_DIR = $$PWD/translations
 CONFIG += lrelease
 CONFIG += embed_translations
 

@@ -386,7 +386,7 @@
   <customwidget>
    <class>TableWidgetUpDown</class>
    <extends>QTableWidget</extends>
-   <header>tablewidgetupdown.h</header>
+   <header>src/tablewidgetupdown.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

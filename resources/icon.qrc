@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>left_rotation_icon.png</file>
+        <file>right_rotation_icon.png</file>
+    </qresource>
+</RCC>
