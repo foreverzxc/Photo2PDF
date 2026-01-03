@@ -108,30 +108,16 @@ void MainWindow::setupConnections()
     // TableWidgetUpDown signals (for drag-drop reordering)
     connect(ui->photoTable, &TableWidgetUpDown::swapPhotosSignal,
             this, [this](int src, int dst) {
-        // 边界检查 - 防止拖到表格外部
-        if (src < 0 || src >= photoModel->rowCount()) {
-            return;
-        }
-        // dst 可以等于 rowCount()（拖到末尾），但不能超出太多
-        if (dst < 0 || dst > photoModel->rowCount()) {
-            return;
-        }
+        if (src < 0 || src >= photoModel->rowCount()) return;
+        if (dst < 0 || dst > photoModel->rowCount()) return;
 
-        // 暂时断开 Model 的信号，避免在拖拽时重复重建
         static bool inDragDrop = false;
         if (inDragDrop) return;
         inDragDrop = true;
 
-        // 阻塞 Model 的信号
         photoModel->blockSignals(true);
-
-        // 同步 Model
         photoModel->moveRows(QModelIndex(), src, 1, QModelIndex(), dst);
-
-        // 重建 Table
         rebuildTableFromModel();
-
-        // 恢复 Model 的信号
         photoModel->blockSignals(false);
         inDragDrop = false;
     });

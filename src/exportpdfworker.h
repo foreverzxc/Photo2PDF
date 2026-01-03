@@ -42,7 +42,7 @@ signals:
 private:
     void ExportPDF() {
         QPdfWriter pdfWriter(config.outputPath);
-        pdfWriter.setResolution(72);  // 设置 DPI
+        pdfWriter.setResolution(72);
         pdfWriter.setPageMargins(QMarginsF(0, 0, 0, 0));
 
         QPainter painter;
@@ -76,7 +76,7 @@ private:
                 document.close();
             }
 
-            emit ProgressUpdatedSignal(i + 1, totalFiles);  // 更新进度
+            emit ProgressUpdatedSignal(i + 1, totalFiles);
 
             if (image.isNull()) {
                 emit ErrorOccurredSignal("Failed to load image: " + imagePath);
